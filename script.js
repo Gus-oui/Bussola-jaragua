@@ -1,7 +1,4 @@
-
-} else {
-  statusEl.textContent = "Geolocalização não suportada.";
-}// Coordenadas do Pico do Jaraguá
+// Coordenadas do Pico do Jaraguá
 const jaraguaLat = -23.4567;
 const jaraguaLon = -46.7350;
 
@@ -99,6 +96,11 @@ function requestOrientationPermission() {
     window.addEventListener("deviceorientation", handleOrientation, true);
   }
 }
+
+// Solicita permissão ao clicar ou carregar
+document.body.addEventListener("click", requestOrientationPermission);
+window.addEventListener("load", requestOrientationPermission);
+
 
 // Solicita permissão ao clicar ou carregar
 document.body.addEventListener("click", requestOrientationPermission);
