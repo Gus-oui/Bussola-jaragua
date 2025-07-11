@@ -5,21 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bússola para o Pico do Jaraguá</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- CSS do Leaflet -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+  />
 </head>
 <body>
-  <h1>Bússola para o Pico do Jaraguá</h1>
+  <div id="map"></div>
+
   <div id="compass-container">
-    
-    <img
-      id="needle"
-      src="https://www.clker.com/cliparts/F/c/j/W/w/4/compassnorth-md.png"
-      alt="Agulha da bússola"
-    />
+    <img id="needle" src="https://www.clker.com/cliparts/F/c/j/W/w/4/compassnorth-md.png" alt="Agulha da bússola" />
   </div>
+
   <p id="status">Carregando localização e orientação...</p>
 
+  <!-- JS do Leaflet -->
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
+  ></script>
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
