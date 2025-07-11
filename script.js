@@ -1,29 +1,42 @@
-// Coordenadas do Pico do Jaraguá
 const jaraguaLat = -23.4567;
 const jaraguaLon = -46.7350;
 
 const needleEl = document.getElementById("needle");
 const statusEl = document.getElementById("status");
 
-let currentHeading = 0;     // orientação do dispositivo (em graus)
-let targetBearing = 0;      // direção até o Pico do Jaraguá
+let currentHeading = 0;
+let targetBearing = 0;
 
-// Converte graus para radianos
+// Configura o mapa
+const map = L.map("map").setView([jaraguaLat, jaraguaLon], 13);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap",
+}).addTo(map);
+
+// Marcador da sua posição
+const userMarker = L.marker([jaraguaLat, jaraguaLon]).addTo(map);
+
+// Atualiza posição no mapa
+function updateMapPosition(lat, lon) {
+  userMarker.setLatLng([lat, lon]);
+  map.setView([lat, lon]);
+}
+
+// Converte para radianos
 function toRadians(deg) {
   return deg * Math.PI / 180;
 }
 
-// Converte radianos para graus
+// Converte para graus
 function toDegrees(rad) {
   return rad * 180 / Math.PI;
 }
 
-// Calcula o azimute entre dois pontos geográficos
+// Calcula o azimute entre dois pontos
 function calculateBearing(lat1, lon1, lat2, lon2) {
   const φ1 = toRadians(lat1);
   const φ2 = toRadians(lat2);
   const Δλ = toRadians(lon2 - lon1);
-
   const y = Math.sin(Δλ) * Math.cos(φ2);
   const x =
     Math.cos(φ1) * Math.sin(φ2) -
@@ -38,11 +51,12 @@ function updateNeedle() {
   needleEl.style.transform = `rotate(${rotation}deg)`;
 }
 
-// Geolocalização
+// Geolocalização contínua
 if (navigator.geolocation) {
   navigator.geolocation.watchPosition(
     (position) => {
       const { latitude, longitude } = position.coords;
+      updateMapPosition(latitude, longitude);
       targetBearing = calculateBearing(latitude, longitude, jaraguaLat, jaraguaLon);
       updateNeedle();
     },
@@ -55,25 +69,23 @@ if (navigator.geolocation) {
   statusEl.textContent = "Geolocalização não suportada.";
 }
 
-// Sensor de orientação absoluta (iOS 13+ exige permissão)
+// Captura orientação do celular
 function handleOrientation(event) {
-  if (event.absolute || typeof event.webkitCompassHeading !== "undefined") {
-    let heading;
+  let heading;
+  if (typeof event.webkitCompassHeading !== "undefined") {
+    heading = event.webkitCompassHeading;
+  } else if (event.alpha !== null) {
+    heading = 360 - event.alpha;
+  }
 
-    // Safari iOS usa webkitCompassHeading (em vez de alpha)
-    if (typeof event.webkitCompassHeading !== "undefined") {
-      heading = event.webkitCompassHeading;
-    } else {
-      heading = 360 - event.alpha; // Corrige a rotação padrão
-    }
-
+  if (heading !== undefined) {
     currentHeading = heading;
     updateNeedle();
-    statusEl.textContent = "Bússola ativa e corrigida.";
+    statusEl.textContent = "Mapa e bússola ativos.";
   }
 }
 
-// Verifica se precisa solicitar permissão no iOS
+// Permissões iOS
 function requestOrientationPermission() {
   if (
     typeof DeviceOrientationEvent !== "undefined" &&
@@ -91,18 +103,11 @@ function requestOrientationPermission() {
         statusEl.textContent = "Erro ao solicitar permissão.";
       });
   } else {
-    // Android ou iOS mais antigo
     window.addEventListener("deviceorientationabsolute", handleOrientation, true);
     window.addEventListener("deviceorientation", handleOrientation, true);
   }
 }
 
-// Solicita permissão ao clicar ou carregar
+// Solicita permissão
 document.body.addEventListener("click", requestOrientationPermission);
 window.addEventListener("load", requestOrientationPermission);
-
-
-// Solicita permissão ao clicar ou carregar
-document.body.addEventListener("click", requestOrientationPermission);
-window.addEventListener("load", requestOrientationPermission);
-
