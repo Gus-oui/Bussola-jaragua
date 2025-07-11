@@ -111,3 +111,5 @@ function requestOrientationPermission() {
 // Solicita permissão
 document.body.addEventListener("click", requestOrientationPermission);
 window.addEventListener("load", requestOrientationPermission);
+
+
